@@ -8,7 +8,7 @@ endpoints = {
     "chat-ai": {
         "url": "https://chat-ai.academiccloud.de/v1/chat/completions",
         "api_key": os.environ.get("CHAT_AI_API_TOKEN", "92bbad82caba7a2f0d0515bcf5a76cfc"),
-        "model": "meta-llama-3.1-8b-instruct"
+        "model": "llama-3.3-70b-instruct"
     },
     "ki@jlu": {
         "url": "https://ki-dev.hrz.uni-giessen.de/api/chat/completions",
@@ -54,6 +54,7 @@ def chat_with_file(endpoint_choice, system_prompt, user_input, uploaded_file):
 
     payload = {
         "model": selected["model"],
+        "stream": False,
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_input}
@@ -69,10 +70,10 @@ def chat_with_file(endpoint_choice, system_prompt, user_input, uploaded_file):
         return f"Error: {str(e)}"
 
 with gr.Blocks() as iface:
-    gr.Markdown("### LLM Chat Interface with File Upload")
+    gr.Markdown("### File to JSON")
     endpoint_choice = gr.Dropdown(choices=list(endpoints.keys()), label="Select Endpoint")
-    system_prompt = gr.Textbox(label="System Prompt", value="You are a helpful assistant")
-    user_input = gr.Textbox(label="Your Message", placeholder="Type your message here...")
+    system_prompt = gr.Textbox(label="System Prompt", value="Generate JSON from Input. Output only JSON using this template: data = \"{\"modules\":[{\"code\":\"MODULE_CODE\",\"name\":\"MODULE_NAME\",\"semester\":\"SEMESTER\",\"credits\":\"CREDITS\",\"description\":\"DESCRIPTION\",\"lectures\":[{\"lv_code\":\"LV\",\"name\":\"LECTURE_NAME\",\"exams\"LECTURE_EXAM_TYPE}],\",\"prerequisites\":\"PREREQUISITES\"}]}\"")
+    user_input = gr.Textbox(label="Your Message", value="Generate metadata from this Module", placeholder="Type your message here...")
     uploaded_file = gr.File(label="Upload a File (optional)")
     output_text = gr.Textbox(label="LLM Response")
     submit = gr.Button("Send")
